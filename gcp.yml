@@ -27,7 +27,7 @@ spec:
           title: Infra Components Needed
           items:
             type: string
-            enum: [VM,Cloud Storage]
+            enum: [vm,cs]
           uniqueItems: true
         agent_action:
           type: string
