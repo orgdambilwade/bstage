@@ -1,8 +1,8 @@
 apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
-  name: create-dynamic-infra-provisioner
-  title: Create New Agent Infra - GCP
+  name: GCP basic Infra Provisioner
+  title: Create 1 X VM & 1 X Cloud Storage
   description: Provision infrastructure for new agent development on Google Cloud Platform.
   tags:
     - gcp
