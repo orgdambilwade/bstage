@@ -1,0 +1,80 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+kind: Template
+metadata:
+  name: create-dynamic-infra-provisioner
+  title: Create New Agent Infra - GCP
+  description: Provision infrastructure for new agent development on Google Cloud Platform.
+  tags:
+    - gcp
+    - terraform
+spec:
+  owner: development
+  type: service
+  
+  parameters:
+    - title: Infra Request Inputs
+      required: [agent_identifier_name, platform, infra_components, agent_action]
+      properties:
+        agent_identifier_name:
+          type: string
+          title: Agent Name
+        platform:
+          type: string
+          title: Hyperscaler Platform
+          enum: [AWS, Azure, GCP]
+        infra_components:
+          type: array
+          title: Infra Components Needed
+          items:
+            type: string
+            enum: [VM,Cloud Storage]
+          uniqueItems: true
+        agent_action:
+          type: string
+          title: Action
+          enum: 
+            - create
+          default: create
+        source_code_needed:
+          type: string
+          title: Does Agent Have Source Code?
+          enum:
+            - yes
+            - no
+          default: no 
+  steps:
+    - id: create-pr
+      if: ${{ parameters.source_code_needed == "yes" and parameters.agent_action == "create" }}
+      name: Create PR for Create Flow
+      action: publish:github:pull-request
+      input:
+        repoUrl: 'github.com?repo=bstage&owner=dambilwade'
+        branchName: gcp-dynamic-agent-${{ parameters.agent_identifier_name }}
+        title: "Provision Dynmic Infra (Create) for ${{ parameters.agent_identifier_name }}"
+        description: "Triggered from Backstage to Dynamic infra for agent ${{ parameters.agent_identifier_name }}"
+        commitMessage: "Provision Infra (Create) for ${{ parameters.agent_identifier_name }}"
+        targetPath: .
+    
+    - id: trigger-terraform
+      name: Trigger GitHub Workflow
+      if: ${{ parameters.source_code_needed == 'no' and parameters.agent_action == 'create' }}
+      action: github:actions:dispatch
+      input:
+        workflowId: terraform.yml      
+        repoUrl: 'github.com?repo=bstage&owner=dambilwade'
+        branchOrTagName: 'main'
+        workflowInputs:
+          agent_identifier_name: ${{ parameters.agent_identifier_name }}
+          components: ${{ parameters.infra_components | join(',') }}
+          agent_action: ${{ parameters.agent_action }}          
+        
+    - id: notify-result
+      name: Notify Completion
+      action: debug:log
+      input:
+        message: 'Terraform provisioning has been triggered for agent ${{ parameters.agent_identifier_name }}.'
+
+  output:
+    links:
+      - title: Deployment Status
+        url: https://github.com/dambilwade/bstage/actions/workflows/terraform.yml/badge.svg
