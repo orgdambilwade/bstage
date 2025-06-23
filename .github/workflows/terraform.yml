@@ -64,4 +64,4 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Make the HTTP POST request
         run: |
-          curl "http://24.46.107.64:7080/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\\"id\\": \\"$UNIQUE_ID\\", \\"components\\": \\"$components\\", \\"requestedtime\\": \\"$TIMESTAMP_TZ\\", \\"expirytime\\": \\"$EXPIRY_TIME\\", \\"agent_identifier_name\\": \\"$agent_identifier_name\\"}"
+          curl "http://24.46.107.64:7080/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{"id": "$UNIQUE_ID", "components": "$components", "requestedtime": "$TIMESTAMP_TZ", "expirytime": "$EXPIRY_TIME", "agent_identifier_name": "$agent_identifier_name"}"
