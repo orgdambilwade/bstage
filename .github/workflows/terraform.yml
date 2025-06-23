@@ -1,15 +1,15 @@
 # This is a basic workflow to help you get started with Actions
 
-name: CI
+name: Insert Requests from Backstage Details into Postgres Database
 
 # Controls when the workflow will run
-on:
+#on:
   # Triggers the workflow on push or pull request events but only for the "main" branch
-  push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
+  #push:
+  #  branches: [ "main" ]
+  #pull_request:
+  #  branches: [ "main" ]
+on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
     inputs:
@@ -32,27 +32,35 @@ on:
         default: false
         type: boolean
 
+      duration:
+        description: 'Infra life in days'
+        required: true
+        default: 10
+        type: number
+
         
         
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
-  build:
+  accept_request:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      #- uses: actions/checkout@v4
 
       # Runs a single command using the runners shell
-      - name: Run a one-line script
-        run: echo Hello, world!
+      - name: Initialize Variables
+        run: |
+          export UNIQUE_ID=$(uuidgen)
+          export TIMESTAMP_TZ=$(date --iso-8601=seconds)
+          export EXPIRY_TIME=$(date -d "+$duration days" --iso-8601=seconds)
 
       # Runs a set of commands using the runners shell
-      - name: Run a multi-line script
+      - name: Make the HTTP POST request
         run: |
-          echo Add other actions to build,
-          echo test, and deploy your project.
+          curl "http://24.46.107.64:7080/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$UNIQUE_ID\", \"components\": \"$components\",\"requestedtime\": \"$TIMESTAMP_TZ\",\"expirytime\": \"$EXPIRY_TIME\"}"
