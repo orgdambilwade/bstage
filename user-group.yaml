@@ -1,0 +1,23 @@
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-group
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: dev-team
+spec:
+  type: team
+  members: [kp]
+
+
+---
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-user
+apiVersion: backstage.io/v1alpha1
+kind: User
+metadata:
+  name: kp
+spec:
+  profile:
+    displayName: Kamlesh Pandey
+    email: kamlesh.pandey@capgemini.com
+  
+  memberOf:
+    - group: default/dev-team
