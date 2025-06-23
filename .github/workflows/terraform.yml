@@ -35,8 +35,6 @@ on:
       duration:
         description: 'Infra life in days'
         required: true
-        default: 10
-        type: number
 
         
         
