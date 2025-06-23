@@ -14,15 +14,15 @@ on:
   workflow_dispatch:
     inputs:
       agent_identifier_name:
-        description: 'Name'
+        description: 'Agent Name'
         required: true
 
       components:
-        description: 'Compo'
+        description: 'Components'
         required: true
 
       agent_action:
-        description: 'AA'
+        description: 'Agent Action'
         required: true
 
       deploy_only:
