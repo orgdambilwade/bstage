@@ -54,6 +54,7 @@ jobs:
       # Runs a single command using the runners shell
       - name: Initialize Variables
         run: |
+          timedatectl set-timezone America/New_York
           export UNIQUE_ID=$(uuidgen)
           export TIMESTAMP_TZ=$(date --iso-8601=seconds)
           export EXPIRY_TIME=$(date -d "+$duration days" --iso-8601=seconds)
