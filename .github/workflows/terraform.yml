@@ -52,7 +52,7 @@ jobs:
         run: |
           export UNIQUE_ID=$(uuidgen)
           export TIMESTAMP_TZ=$(date --iso-8601=seconds)
-          export EXPIRY_TIME=$(date -d \"+$duration days\" --iso-8601=seconds)
+          export EXPIRY_TIME=$(date -d "+\"$duration\" days" --iso-8601=seconds)
           echo "$UNIQUE_ID"
           echo "$TIMESTAMP_TZ"
           echo "$EXPIRY_TIME"
