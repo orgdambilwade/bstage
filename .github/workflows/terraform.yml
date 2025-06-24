@@ -26,11 +26,7 @@ on:
         description: 'Agent Action'
         required: true
 
-      deploy_only:
-        description: 'action'
-        required: false
-        default: false
-        type: boolean
+
 
       duration:
         description: 'Infra life in days'
