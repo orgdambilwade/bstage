@@ -40,7 +40,7 @@ jobs:
   # This workflow contains a single job called "build"
   accept_request:
     # The type of runner that the job will run on
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -51,8 +51,8 @@ jobs:
       - name: Initialize Variables
         run: |
           export UNIQUE_ID=$(uuidgen)
-          export TIMESTAMP_TZ=$(date --iso-8601=seconds)
-          export EXPIRY_TIME=$(date -d "+$duration days" --iso-8601=seconds)
+          export TIMESTAMP_TZ=$(date --u --iso-8601=seconds)
+          export EXPIRY_TIME=$(date --u -d "+${duration} days" --iso-8601=seconds)
           echo "$UNIQUE_ID"
           echo "$TIMESTAMP_TZ"
           echo "$EXPIRY_TIME"
@@ -60,4 +60,4 @@ jobs:
       # Runs a set of commands using the runners shell
       - name: Make the HTTP POST request
         run: |
-          curl "http://24.46.107.64:7080/REQUESTED" -X POST -H "Content-Type: application/json"  -d '[{\"id\": \"$UNIQUE_ID\", \"components\": \"$components\", \"requestedtime\": \"$TIMESTAMP_TZ\"}]'
+          curl "http://24.46.107.64:7080/REQUESTED" -X POST -H "Content-Type: application/json"  -d '[{\"id\": \"$UNIQUE_ID\", \"components\": \"$components\", \"requestedtime\": \"${TIMESTAMP_TZ\"}]'
