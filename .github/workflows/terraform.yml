@@ -62,7 +62,7 @@ jobs:
 
       - name: Make the HTTP POST request
         run: |
-          curl "http://24.46.107.64:7080/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$(uuidgen)\", \"components\": \"${{ github.event.inputs.components }}\", \"requestedtime\": \"$(date -u --iso-8601=seconds)\" , \"expirytime\": \"$(date -u --iso-8601=seconds -d "+10 days")\"}"
+          curl "http://24.46.107.64:7080/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$(uuidgen)\", \"components\": \"${{ github.event.inputs.components }}\", \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\"}"
 
 
       #- name: Debugging Session with Tmate
