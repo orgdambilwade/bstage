@@ -26,6 +26,27 @@ jobs:
           run: |
             echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
 
+        - name: Clone the TF templates directory
+          uses: actions/checkout@v2
+
+        - id: auth
+          name: Authenticate To Google Cloud
+          uses: google-github-actions/auth@v2
+          with:
+            workload_identity_provider: 'projects/351592443/locations/global/workloadIdentityPools/identity-pool-2/providers/da-idp'
+            service_account: '${{ secrets.SERVICE_ACCOUNT }}'
+            project_id: '${{ secrets.PROJECT_ID }}'
+
+
+            
+
+        - name: Setup Cloud SDK
+          uses: google-github-actions/setup-gcloud@v2
+  
+        - name: Use gcloud CLI
+          run: gcloud info
+
+
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v2
           with:
@@ -43,8 +64,7 @@ jobs:
             echo $RESOURCE_EXPIRY_TIME
             
 
-        - name: Clone the TF templates directory
-          uses: actions/checkout@v4
+
 
         - name: Prepare terraform files
           run: |
@@ -59,20 +79,8 @@ jobs:
             done
             pwd
 
-        - id: auth
-          name: Authenticate To Google Cloud
-          uses: google-github-actions/auth@v2
-          with:
-            workload_identity_provider: 'projects/351592443/locations/global/workloadIdentityPools/identity-pool-2/providers/da-idp'
-            service_account: '${{ secrets.SERVICE_ACCOUNT }}'
-            project_id: '${{ secrets.PROJECT_ID }}'
-            
 
-        - name: Setup Cloud SDK
-          uses: google-github-actions/setup-gcloud@v2
 
-        - name: Use gcloud CLI
-          run: gcloud info
 
         - name: Apply Terraform
           id: tf
@@ -81,6 +89,7 @@ jobs:
             export PG_CONN_STR=${{ secrets.PGDBCONNSTR }}
             cat main.tf
             terraform init
+            terraform validate
             terraform plan
             terraform apply -auto-approve
             # NOT WORKINGecho "OP=$(terraform output)" >> $GITHUB_OUTPUT
