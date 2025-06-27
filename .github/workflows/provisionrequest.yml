@@ -14,9 +14,9 @@ jobs:
     steps:
         - name: Get request details from DB & store it in Shell variables
           run: |
-            ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].id")
-            COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].components")
-            RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].expirytime")
+            ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].id") >> $GITHUB_ENV
+            COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].components") >> $GITHUB_ENV
+            RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].expirytime") >> $GITHUB_ENV
 
 
         - name: Clone the TF templates directory
@@ -24,6 +24,9 @@ jobs:
 
         - name: Prepare terraform files
           run: |
+            echo $ID
+            echo $COMPONENTS
+            echo $RESOURCE_EXPIRY_TIME
             cd terraform_templates
             sed -i "s/request_id/$ID/g" main.tf
             IFS=','
