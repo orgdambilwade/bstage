@@ -79,10 +79,11 @@ jobs:
           run: |
             cd terraform_templates
             export PG_CONN_STR=${{ secrets.PGDBCONNSTR }}
+            cat main.tf
             terraform init
             terraform plan
             terraform apply -auto-approve
-            # echo "OP=$(terraform output)" >> $GITHUB_OUTPUT
+            # NOT WORKINGecho "OP=$(terraform output)" >> $GITHUB_OUTPUT
 
 
 

@@ -3,7 +3,7 @@
 terraform {
 
   required_providers {
-    google = {
+    gcp = {
       source  = "hashicorp/google"
       version = "6.41.0"
     }
@@ -15,7 +15,7 @@ terraform {
   }
 }
 
-provider "google" {
+provider "gcp" {
   project = "eternal-argon-461501-a8"
   region  = "us-central1"
   zone    = "us-central1-a"
