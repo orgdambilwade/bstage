@@ -14,10 +14,16 @@ terraform {
     }
   }
 
+  backend "gcs" {
+    bucket = "staging_bucket_ai"
+    prefix = "terraform/state/abcpqrxyz"
+  }
+
+  /*
   backend "pg" {
     
     schema_name = "request_id"
-  }
+  }*/
 }
 
 provider "gcp" {
