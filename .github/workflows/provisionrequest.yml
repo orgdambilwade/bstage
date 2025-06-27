@@ -90,7 +90,7 @@ jobs:
           run: |
             cd terraform_templates
             export PG_CONN_STR=${{ secrets.PGDBCONNSTR }}
-            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"$(terraform output)\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
 
 
 
