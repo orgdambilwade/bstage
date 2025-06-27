@@ -5,7 +5,12 @@ terraform {
   required_providers {
     gcp = {
       source  = "hashicorp/google"
-      version = "6.41.0"
+      version = "6.8.0"
+    }
+    
+    tls = {
+      source  = "hashicorp/tls"
+      version = "~> 4.0"
     }
   }
 
@@ -16,9 +21,9 @@ terraform {
 }
 
 provider "gcp" {
-  project = "eternal-argon-461501-a8"
-  region  = "us-central1"
-  zone    = "us-central1-a"
+  project = var.project_id
+  region  = var.region
+  zone    = var.zone
 }
 
 resource "random_id" "rand_id_1" {
