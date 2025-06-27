@@ -47,7 +47,7 @@ jobs:
             cd terraform_templates
             sed -i "s/request_id/${{ steps.post_data.outputs.ID }}/g" main.tf
             IFS=','
-            read -ra mod_array <<< "$COMPONENTS"
+            read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
             for element in "${mod_array[@]}"; do
               cat references/"$element".txt >> main.tf
             done
@@ -68,15 +68,9 @@ jobs:
         - name: Use gcloud CLI
           run: gcloud info
 
-        - name: Debugging Session with Tmate
-          uses: mxschmitt/action-tmate@v3  
-
-
         - name: Apply Terraform
           run: |
             cd terraform_templates
-            pwd
-            
             terraform init
             terraform plan
             terraform apply -auto-approve

@@ -10,7 +10,6 @@ terraform {
   }
 
   backend "pg" {
-    conn_str = PG_CONN_STR
     schema_name = "request_id"
   }
 }
