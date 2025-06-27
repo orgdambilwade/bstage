@@ -1,0 +1,9 @@
+module "bucket" {
+  source="./bucket"
+  bucket_name = "bk${random_id.rand_id_1.hex}"
+  region = var.region
+}
+
+output "BucketAll" {
+  value = module.bucket
+}
