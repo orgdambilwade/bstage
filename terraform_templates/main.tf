@@ -16,7 +16,7 @@ terraform {
 }
 
 // start
-
+/*
 data "google_client_config" "default" {
   provider = google
 }
@@ -28,11 +28,11 @@ data "google_service_account_access_token" "default" {
   lifetime               = "300s"
 }
 
-/*
+
 provider "google" {
   alias        = "impersonated"
   access_token = data.google_service_account_access_token.default.access_token
-}*/
+}
 
 data "google_client_openid_userinfo" "me" {
   provider = google.impersonated
@@ -42,12 +42,9 @@ output "target-email" {
   value = data.google_client_openid_userinfo.me.email
 }
 
-
-
-
 //end
 
-
+*/
 provider "google" {
   project = "eternal-argon-461501-a8"
   region  = "us-central1"

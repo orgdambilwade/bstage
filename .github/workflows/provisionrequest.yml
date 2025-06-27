@@ -74,6 +74,7 @@ jobs:
           run: |
             cd terraform_templates
             pwd
+            gcloud auth login
             terraform init
             terraform plan
             terraform apply -auto-approve
