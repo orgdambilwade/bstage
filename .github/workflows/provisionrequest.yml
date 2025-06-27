@@ -25,7 +25,7 @@ jobs:
         - name: Prepare terraform files
           run: |
             cd terraform_templates
-            sed -i "s/request_id/$UNIQUE_ID/g" main.tf
+            sed -i "s/request_id/$ID/g" main.tf
             IFS=','
             read -ra mod_array <<< "$COMPONENTS"
             for element in "${mod_array[@]}"; do
