@@ -84,17 +84,13 @@ jobs:
             terraform apply -auto-approve
             # echo "OP=$(terraform output)" >> $GITHUB_OUTPUT
 
-        - name: Debugging Session with Tmate
-          uses: mxschmitt/action-tmate@v3    
-      # Runs a set of commands using the runners shell
-
-
-
 
 
         - name: Update Provisioned Table
           run: |
-            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"${{ steps.tf.outputs.OP }}\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+            cd terraform_templates
+            export PG_CONN_STR=${{ secrets.PGDBCONNSTR }}
+            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"$(terraform output)\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
 
 
 
