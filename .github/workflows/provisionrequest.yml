@@ -6,11 +6,18 @@ on:
 # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
 
+permissions:
+    contents: read
+    id-token: write
+
 jobs:
   # This workflow contains a single job called "build"
   process_provisioning_request:
     # The type of runner that the job will run on
     runs-on: ubuntu-24.04
+    permissions:
+        contents: read
+        id-token: write
 
         
     steps:
@@ -45,6 +52,22 @@ jobs:
               cat references/"$element".txt >> main.tf
             done
             pwd
+
+        - id: auth
+          name: Authenticate To Google Cloud
+          uses: google-github-actions/auth@v2
+          with:
+            workload_identity_provider: 'projects/351592443/locations/global/workloadIdentityPools/identity-pool-2/providers/da-idp'
+            service_account: '${{ secrets.SERVICE_ACCOUNT }}'
+            project_id: '${{ secrets.PROJECT_ID }}'
+
+        - name: Setup Cloud SDK
+          uses: google-github-actions/setup-gcloud@v2
+
+        - name: Use gcloud CLI
+          run: gcloud info
+
+
 
 
         - name: Apply Terraform
