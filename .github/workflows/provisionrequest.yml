@@ -38,6 +38,12 @@ jobs:
               cat references/"$element".txt >> main.tf
             done
 
+        - name: Setup Terraform
+          uses: little-core-labs/install-terraform@v2.0.0
+          with:
+            version: 0.13.4
+
+        
         - name: Apply Terraform
           run: |
             terraform init
