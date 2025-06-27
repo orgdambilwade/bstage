@@ -17,9 +17,6 @@ terraform {
 
 // start
 
-provider "google" {
-}
-
 data "google_client_config" "default" {
   provider = google
 }
