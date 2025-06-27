@@ -21,6 +21,11 @@ jobs:
 
         
     steps:
+        - name: Capture Job Start Time
+          id: start
+          run: |
+            echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
+
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v2
           with:
@@ -70,13 +75,18 @@ jobs:
           run: gcloud info
 
         - name: Apply Terraform
+          id: tf
           run: |
             cd terraform_templates
             export PG_CONN_STR=${{ secrets.PGDBCONNSTR }}
             terraform init
             terraform plan
             terraform apply -auto-approve
+            echo "OP=$(terraform output)" >> $GITHUB_OUTPUT
 
+        - name: Update Provisioned Table
+          run: |
+            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"${{ steps.tf.outputs.OP }}\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
 
 
 
