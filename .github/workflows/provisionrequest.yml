@@ -16,9 +16,9 @@ jobs:
         - name: Get request details from DB & store it in Shell variables
           id: post_data
           run: |
-            ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].id") >> $GITHUB_OUTPUT
-            COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].components") >> $GITHUB_OUTPUT
-            RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].expirytime") >> $GITHUB_OUTPUT
+            echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].id")" >> $GITHUB_OUTPUT
+            echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].components")" >> $GITHUB_OUTPUT
+            echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
             echo $ID
             echo $COMPONENTS
             echo $RESOURCE_EXPIRY_TIME
