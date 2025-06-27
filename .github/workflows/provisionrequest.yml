@@ -11,24 +11,29 @@ jobs:
   process_provisioning_request:
     # The type of runner that the job will run on
     runs-on: ubuntu-24.04
+    env:
+      ID: $(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].id")
+      COMPONENTS: $(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].components")
+      RESOURCE_EXPIRY_TIME: $(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].expirytime")
+        
     steps:
         - name: Get request details from DB & store it in Shell variables
           run: |
-            ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].id") >> $GITHUB_ENV
-            COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].components") >> $GITHUB_ENV
-            RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].expirytime") >> $GITHUB_ENV
-
+            echo $ID
+            echo $COMPONENTS
+            echo $RESOURCE_EXPIRY_TIME
+            
 
         - name: Clone the TF templates directory
           uses: actions/checkout@v4
 
         - name: Prepare terraform files
           run: |
-            echo ${{ env.ID }}
+            echo $ID
             echo $COMPONENTS
             echo $RESOURCE_EXPIRY_TIME
             cd terraform_templates
-            sed -i "s/request_id/${{ env.ID }}/g" main.tf
+            sed -i "s/request_id/$ID/g" main.tf
             IFS=','
             read -ra mod_array <<< "$COMPONENTS"
             for element in "${mod_array[@]}"; do
