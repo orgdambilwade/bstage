@@ -82,7 +82,7 @@ jobs:
             terraform init
             terraform plan
             terraform apply -auto-approve
-            echo "OP=$(terraform output)" >> $GITHUB_OUTPUT
+            # echo "OP=$(terraform output)" >> $GITHUB_OUTPUT
 
         - name: Debugging Session with Tmate
           uses: mxschmitt/action-tmate@v3    
