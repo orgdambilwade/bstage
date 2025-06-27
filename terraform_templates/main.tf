@@ -11,7 +11,7 @@ terraform {
 
   backend "gcs" {
     bucket = "staging_bucket_ai"
-    prefix = "terraform/state/27183167-16e6-4941-ac24-14fa04708868"
+    prefix = "terraform/state/request_id"
   }
 }
 

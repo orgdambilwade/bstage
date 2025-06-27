@@ -17,18 +17,24 @@ jobs:
             ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].id")
             COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].components")
             RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].expirytime")
-            echo $ID
-            echo $COMPONENTS
-            echo $RESOURCE_EXPIRY_TIME
+
 
         - name: Clone the TF templates directory
           uses: actions/checkout@v4
 
-        - name: Change working directory
+        - name: Prepare terraform files
           run: |
-            pwd
             cd terraform_templates
-            ls
+            sed -i "s/request_id/$UNIQUE_ID/g" main.tf
+            IFS=','
+            read -ra mod_array <<< "$COMPONENTS"
+            for element in "${mod_array[@]}"; do
+              cat references/"$element".txt >> main.tf
+            done
+
+            cat main.tf
+
+
 
 
 
