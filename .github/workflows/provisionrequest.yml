@@ -67,7 +67,8 @@ jobs:
         - name: Use gcloud CLI
           run: gcloud info
 
-
+        - name: Debugging Session with Tmate
+          uses: mxschmitt/action-tmate@v3  
 
 
         - name: Apply Terraform
