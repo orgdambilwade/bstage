@@ -46,6 +46,7 @@ jobs:
             echo ${{ steps.post_data.outputs.ID }}
             cd terraform_templates
             sed -i "s/request_id/${{ steps.post_data.outputs.ID }}/g" main.tf
+            sed -i "s/postgresconnectiondetails/${{ secrets.PGDBCONNSTR }}/g" main.tf
             IFS=','
             read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
             for element in "${mod_array[@]}"; do
