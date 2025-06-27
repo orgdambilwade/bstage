@@ -5,7 +5,7 @@ terraform {
   required_providers {
     gcp = {
       source  = "hashicorp/google"
-      version = "6.8.0"
+      version = "6.41.0"
     }
     
     tls = {
@@ -16,14 +16,9 @@ terraform {
 
   backend "gcs" {
     bucket = "staging_bucket_ai"
-    prefix = "terraform/state/abcpqrxyz"
+    prefix = "terraform/state/REQUEST_ID"
   }
 
-  /*
-  backend "pg" {
-    
-    schema_name = "request_id"
-  }*/
 }
 
 provider "gcp" {

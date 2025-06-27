@@ -38,20 +38,16 @@ jobs:
             project_id: '${{ secrets.PROJECT_ID }}'
 
 
-            
-
         - name: Setup Cloud SDK
           uses: google-github-actions/setup-gcloud@v2
   
         - name: Use gcloud CLI
           run: gcloud info
 
-
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v2
           with:
             terraform_version: 1.7.5
-
 
         - name: Get request details from DB & store it in Shell variables
           id: post_data
@@ -62,16 +58,13 @@ jobs:
             echo $ID
             echo $COMPONENTS
             echo $RESOURCE_EXPIRY_TIME
+
             
-
-
-
         - name: Prepare terraform files
           run: |
             echo ${{ steps.post_data.outputs.ID }}
             cd terraform_templates
-            sed -i "s/request_id/${{ steps.post_data.outputs.ID }}/g" main.tf
-            
+            sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" main.tf
             IFS=','
             read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
             for element in "${mod_array[@]}"; do
@@ -79,27 +72,20 @@ jobs:
             done
             pwd
 
-
-
-
         - name: Apply Terraform
           id: tf
           run: |
             cd terraform_templates
-            export PG_CONN_STR=${{ secrets.PGDBCONNSTR }}
             cat main.tf
             terraform init
             terraform validate
             terraform plan
             terraform apply -auto-approve
+            gsutil cp *.pem gs://staging_bucket_ai/terraform/state/${{ steps.post_data.outputs.ID }}/private_access_key.pem
             # NOT WORKINGecho "OP=$(terraform output)" >> $GITHUB_OUTPUT
-
-
 
         - name: Update Provisioned Table
           run: |
-            cd terraform_templates
-            export PG_CONN_STR=${{ secrets.PGDBCONNSTR }}
             curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
 
 
