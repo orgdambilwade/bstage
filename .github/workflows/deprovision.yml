@@ -1,6 +1,6 @@
-#Provisions the infra creation requests on Google Cloud Platform
+#Deprovisions the infra creation requests on Google Cloud Platform
 
-name: Provision the Infrastructure
+name: Deprovision the Infrastructure
 
 on:
 # Allows you to run this workflow manually from the Actions tab
@@ -52,9 +52,9 @@ jobs:
         - name: Get request details from DB & store it in Shell variables
           id: post_data
           run: |
-            echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGCREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
-            echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGCREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
-            echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGCREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
+            echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGDELETION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
+            echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGDELETION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
+            echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGDELETION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
             echo $ID
             echo $COMPONENTS
             echo $RESOURCE_EXPIRY_TIME
@@ -80,13 +80,12 @@ jobs:
             terraform init
             terraform validate
             terraform plan
-            terraform apply -auto-approve
-            gsutil cp *.pem gs://staging_bucket_ai/terraform/state/${{ steps.post_data.outputs.ID }}/private_access_key.pem
+            terraform destroy -auto-approve
             # NOT WORKINGecho "OP=$(terraform output)" >> $GITHUB_OUTPUT
 
-        - name: Update Provisioned Table
+        - name: Update Deprovisioned Table
           run: |
-            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+            curl "http://"${{ secrets.POSTGRES_IP }}"/DEPROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
 
 
 
