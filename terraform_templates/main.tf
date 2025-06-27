@@ -9,10 +9,10 @@ terraform {
     }
   }
 
-  /*backend "gcs" {
+  backend "gcs" {
     bucket = "staging_bucket_ai"
     prefix = "terraform/state/request_id"
-  }*/
+  }
 }
 
 
