@@ -24,11 +24,11 @@ jobs:
 
         - name: Prepare terraform files
           run: |
-            echo $ID
+            echo ${{ env.ID }}
             echo $COMPONENTS
             echo $RESOURCE_EXPIRY_TIME
             cd terraform_templates
-            sed -i "s/request_id/$ID/g" main.tf
+            sed -i "s/request_id/${{ env.ID }}/g" main.tf
             IFS=','
             read -ra mod_array <<< "$COMPONENTS"
             for element in "${mod_array[@]}"; do
