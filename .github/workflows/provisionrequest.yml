@@ -3,6 +3,33 @@
 name: Insert Requests from Backstage Details into Postgres Database
 
 on:
-    # Allows you to run this workflow manually from the Actions tab
+# Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
-        
+
+jobs:
+  # This workflow contains a single job called "build"
+  process_provisioning_request:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-24.04
+    steps:
+        - name: Get request details from DB & store it in Shell variables
+          run: |
+            ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].id")
+            COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].components")
+            RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDING | jq -r ".[0].expirytime")
+            echo $ID
+            echo $COMPONENTS
+            echo $RESOURCE_EXPIRY_TIME
+
+        - name: Clone the TF templates directory
+          uses: actions/checkout@v4
+
+        - name: Change working directory
+          run: |
+            pwd
+            cd terraform_templates
+            ls
+
+
+
+
