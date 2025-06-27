@@ -38,7 +38,13 @@ jobs:
               cat references/"$element".txt >> main.tf
             done
 
-            cat main.tf
+        - name: Apply Terraform
+          run: |
+            terraform init
+            terraform plan
+            terraform apply -auto-approve
+
+
 
 
 
