@@ -60,6 +60,7 @@ jobs:
             workload_identity_provider: 'projects/351592443/locations/global/workloadIdentityPools/identity-pool-2/providers/da-idp'
             service_account: '${{ secrets.SERVICE_ACCOUNT }}'
             project_id: '${{ secrets.PROJECT_ID }}'
+            
 
         - name: Setup Cloud SDK
           uses: google-github-actions/setup-gcloud@v2
@@ -75,8 +76,7 @@ jobs:
           run: |
             cd terraform_templates
             pwd
-            gcloud iam workforce-pools create-cred-config
-            gcloud auth login --login-config="config.json"
+            
             terraform init
             terraform plan
             terraform apply -auto-approve
