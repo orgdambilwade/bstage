@@ -1,0 +1,9 @@
+module "storage" {
+    source = "./storage"
+    tf_unique_id = "storage${random_id.rand_id_1.hex}"
+}
+
+output "storageall" {
+  value = module.storage
+}
+

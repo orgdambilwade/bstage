@@ -1,0 +1,9 @@
+module "vertexaiworkbench" {
+    source = "./vertexaiworkbench"
+    tf_unique_id = "vertexaiworkbench${random_id.rand_id_1.hex}"
+}
+
+output "vertexaiworkbenchall" {
+  value = module.vertexaiworkbench
+}
+

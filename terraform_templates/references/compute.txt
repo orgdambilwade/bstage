@@ -1,0 +1,9 @@
+module "compute" {
+    source = "./compute"
+    tf_unique_id = "compute${random_id.rand_id_1.hex}"
+}
+
+output "computeall" {
+  value = module.compute
+}
+

@@ -1,0 +1,9 @@
+module "cloudrun" {
+    source = "./cloudrun"
+    tf_unique_id = "cloudrun${random_id.rand_id_1.hex}"
+}
+
+output "cloudrunall" {
+  value = module.cloudrun
+}
+

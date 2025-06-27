@@ -1,0 +1,9 @@
+module "vertexaitensorboard" {
+    source = "./vertexaitensorboard"
+    tf_unique_id = "vertexaitensorboard${random_id.rand_id_1.hex}"
+}
+
+output "vertexaitensorboardall" {
+  value = module.vertexaitensorboard
+}
+

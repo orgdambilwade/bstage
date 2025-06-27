@@ -1,0 +1,9 @@
+module "kubernetes" {
+    source = "./kubernetes"
+    tf_unique_id = "kubernetes${random_id.rand_id_1.hex}"
+}
+
+output "kubernetesall" {
+  value = module.kubernetes
+}
+
