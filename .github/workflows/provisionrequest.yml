@@ -1,0 +1,8 @@
+#Provisions the infra creation requests on Google Cloud Platform
+
+name: Insert Requests from Backstage Details into Postgres Database
+
+on:
+    # Allows you to run this workflow manually from the Actions tab
+    workflow_dispatch:
+        
