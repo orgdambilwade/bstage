@@ -74,7 +74,8 @@ jobs:
           run: |
             cd terraform_templates
             pwd
-            gcloud auth login
+            gcloud iam workforce-pools create-cred-config
+            gcloud auth login --login-config="config.json"
             terraform init
             terraform plan
             terraform apply -auto-approve
