@@ -1,0 +1,10 @@
+pydantic
+google-genai
+python-dotenv
+pytest
+black
+google_adk
+google-adk
+pytest-asyncio
+google-cloud-aiplatform[adk,agent-engines]
+absl-py
