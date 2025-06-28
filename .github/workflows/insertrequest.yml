@@ -21,20 +21,18 @@ on:
         description: 'Components'
         required: true
 
-
       agent_action:
         description: 'Agent Action'
         required: true
-
-
 
       duration:
         description: 'Infra life in days'
         required: true
 
+      type:
+        description: 'Infra life in days'
+        required: true
         
-        
-
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
