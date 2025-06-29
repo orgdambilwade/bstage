@@ -66,7 +66,9 @@ jobs:
             cd ${{ steps.post_data.outputs.COMPONENTS }}
             pwd
             ls
-            gcloud run deploy abcpqr --source . --region us-central1 --project eternal-argon-461501-a8 --allow-unauthenticated --set-env-vars="GOOGLE_CLOUD_PROJECT=eternal-argon-461501-a8,GOOGLE_CLOUD_LOCATION=us-central1,GOOGLE_GENAI_USE_VERTEXAI=True"
+            SERVICENAME=$(${{ steps.post_data.outputs.ID }} | head -c 8)
+            echo $SERVICENAME
+            gcloud run deploy $SERVICENAME --source . --region us-central1 --project eternal-argon-461501-a8 --allow-unauthenticated --set-env-vars="GOOGLE_CLOUD_PROJECT=eternal-argon-461501-a8,GOOGLE_CLOUD_LOCATION=us-central1,GOOGLE_GENAI_USE_VERTEXAI=True"
 
         - name: Update Provisioned Table
           run: |
