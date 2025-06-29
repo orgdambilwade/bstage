@@ -27,7 +27,7 @@ jobs:
             echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
 
         - name: Clone the directory
-          uses: actions/checkout@v2
+          uses: actions/checkout@v4
 
         - id: auth
           name: Authenticate To Google Cloud
@@ -40,14 +40,12 @@ jobs:
 
         - name: Setup Cloud SDK
           uses: google-github-actions/setup-gcloud@v2
+          with:
+            version: '>= 528.0.0'
   
         - name: Use gcloud CLI
           run: gcloud info
 
-        - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v2
-          with:
-            terraform_version: 1.7.5
 
         - name: Get request details from DB & store it in Shell variables
           id: post_data
