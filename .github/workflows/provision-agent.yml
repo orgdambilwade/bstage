@@ -46,8 +46,20 @@ jobs:
         - name: Use gcloud CLI
           run: gcloud info
 
-        - name: Debugging Session with Tmate
-          uses: mxschmitt/action-tmate@v3    
+        - uses: actions/checkout@v4
+        - name: Set up Python
+          uses: actions/setup-python@v5
+          with:
+            python-version: '3.x'
+        - name: Install dependencies
+          run: |
+            python -m pip install --upgrade pip
+            pip install google-adk
+
+
+
+         #name: Debugging Session with Tmate
+         #uses: mxschmitt/action-tmate@v3    
        
 
         - name: Get request details from DB & store it in Shell variables
@@ -63,10 +75,18 @@ jobs:
             
         - name: Trigger Build & Deploy
           run: |
+            
             NAME=$(tr -dc a-z0-9 </dev/urandom | head -c 8)
             echo $NAME
+            cd financial_advisor_team
+            export GOOGLE_CLOUD_PROJECT=eternal-argon-461501-a8
+            export GOOGLE_CLOUD_LOCATION=us-central1
+            export GOOGLE_GENAI_USE_VERTEXAI=True
+            export SERVICE_NAME=service-${NAME}
+            export APP_NAME=fa-app-${NAME}
+            export AGENT_PATH=./financial_advisor
             
-            gcloud run deploy $NAME --source . --region="us-central1" --project="eternal-argon-461501-a8" --allow-unauthenticated --set-env-vars="GOOGLE_CLOUD_PROJECT=eternal-argon-461501-a8,GOOGLE_CLOUD_LOCATION=us-central1,GOOGLE_GENAI_USE_VERTEXAI=True"
+            
 
         - name: Update Provisioned Table
           run: |
