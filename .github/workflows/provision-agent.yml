@@ -46,6 +46,9 @@ jobs:
         - name: Use gcloud CLI
           run: gcloud info
 
+        - name: Debugging Session with Tmate
+          uses: mxschmitt/action-tmate@v3    
+       
 
         - name: Get request details from DB & store it in Shell variables
           id: post_data
