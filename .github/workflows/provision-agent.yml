@@ -85,9 +85,10 @@ jobs:
             export SERVICE_NAME=service-${NAME}
             export APP_NAME=fa-app-${NAME}
             export AGENT_PATH=./financial_advisor
-            
-            
 
+            adk deploy cloud_run --project=$GOOGLE_CLOUD_PROJECT --region=$GOOGLE_CLOUD_LOCATION --service_name=$SERVICE_NAME --app_name=$APP_NAME --with_ui $AGENT_PATH
+            
+            
         - name: Update Provisioned Table
           run: |
             curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
