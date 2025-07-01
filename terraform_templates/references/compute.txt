@@ -14,8 +14,9 @@ resource "local_file" "ssh_private_key_pem" {
 
 resource "google_storage_bucket_object" "object" {
   bucket = "staging_bucket_ai"
-  name   = "terraform/keys/${random_id.rand_id_1.hex}-ssh_private_key.pem"
+  name   = "terraform/state/REQUEST_ID/${random_id.rand_id_1.hex}-ssh_private_key.pem"
   source = "${random_id.rand_id_1.hex}-ssh_private_key.pem"
+  depends_on = [local_file.ssh_private_key_pem]
 }
 
 
