@@ -12,6 +12,13 @@ resource "local_file" "ssh_private_key_pem" {
   file_permission = "0600"
 }
 
+resource "google_storage_bucket_object" "object" {
+  bucket = "staging_bucket_ai"
+  name   = "terraform/state/REQUEST_ID/${random_id.rand_id_1.hex}-ssh_private_key.pem"
+  source = "${random_id.rand_id_1.hex}-ssh_private_key.pem"
+}
+
+
 module "compute" {
   source = "./compute"
   instance_name = "vm${random_id.rand_id_1.hex}"
