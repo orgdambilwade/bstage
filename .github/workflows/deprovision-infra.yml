@@ -64,12 +64,12 @@ jobs:
           run: |
             echo ${{ steps.post_data.outputs.ID }}
             cd terraform_templates
-            sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" main.tf
             IFS=','
             read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
             for element in "${mod_array[@]}"; do
               cat references/"$element".txt >> main.tf
             done
+            sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" main.tf
             pwd
 
         - name: Apply Terraform
@@ -85,7 +85,7 @@ jobs:
 
         - name: Update Deprovisioned Table
           run: |
-            curl "http://"${{ secrets.POSTGRES_IP }}"/DEPROVISIONED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+            curl "http://"${{ secrets.POSTGRES_IP }}"/DEPROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
 
 
 
