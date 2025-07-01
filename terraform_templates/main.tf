@@ -3,7 +3,7 @@
 terraform {
 
   required_providers {
-    gcp = {
+    google = {
       source  = "hashicorp/google"
       version = "6.41.0"
     }
@@ -21,7 +21,7 @@ terraform {
 
 }
 
-provider "gcp" {
+provider "google" {
   project = var.project_id
   region  = var.region
   zone    = var.zone
