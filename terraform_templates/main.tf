@@ -1,5 +1,3 @@
-//Placeholder File
-
 terraform {
 
   required_providers {
@@ -15,21 +13,19 @@ terraform {
   }
 
   backend "gcs" {
-    bucket = "staging_bucket_ai"
+    bucket = "STAGING_BUCKET"
     prefix = "terraform/state/REQUEST_ID"
   }
 
 }
 
 provider "google" {
-  project = var.project_id
-  region  = var.region
-  zone    = var.zone
+  project = var.project_id_root
+  region  = var.region_root
+  zone    = var.zone_root
 }
 
-resource "random_id" "rand_id_1" {
-  byte_length = 4
-}
+
 
 
 

@@ -34,3 +34,23 @@ variable "public_key" {
     description = "public key to be used"
     type        = string
 }
+
+variable "compute_image" {
+    description = "compute image type"
+    type        = string
+}
+
+variable "compute_machine_type" {
+    description = "compute machine type"
+    type        = string
+}
+
+variable "request_id" {
+    description = "provisioning request id"
+    type        = string
+}
+
+variable "compute_disk_size" {
+    description = "Compute Disk Size"
+    type        = number
+}

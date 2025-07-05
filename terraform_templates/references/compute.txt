@@ -8,27 +8,31 @@ resource "tls_private_key" "ssh" {
 
 resource "local_file" "ssh_private_key_pem" {
   content      = tls_private_key.ssh.private_key_pem
-  filename     = "${random_id.rand_id_1.hex}-ssh_private_key.pem"
+  filename     = "${var.request_id_root}-ssh_private_key.pem"
   file_permission = "0600"
 }
 
 resource "google_storage_bucket_object" "object" {
-  bucket = "staging_bucket_ai"
-  name   = "terraform/state/REQUEST_ID/${random_id.rand_id_1.hex}-ssh_private_key.pem"
-  source = "${random_id.rand_id_1.hex}-ssh_private_key.pem"
+  bucket = "STAGING_BUCKET"
+  name   = "terraform/state/${var.request_id_root}/${var.request_id_root}-ssh_private_key.pem"
+  source = "${var.request_id_root}-ssh_private_key.pem"
   depends_on = [local_file.ssh_private_key_pem]
 }
 
 
 module "compute" {
   source = "./compute"
-  instance_name = "vm${random_id.rand_id_1.hex}"
-  service_account = var.service_account
-  project_id = var.project_id
-  region = var.region
-  zone = var.zone
-  username = "${random_id.rand_id_1.hex}"
+  instance_name = "vm-${var.request_id_root}"
+  service_account = var.service_account_root
+  project_id = var.project_id_root
+  region = var.region_root
+  zone = var.zone_root
+  username = "u-${var.request_id_root}"
   public_key = "${tls_private_key.ssh.public_key_openssh}"
+  request_id = var.request_id_root
+  compute_image = var.compute_image
+  compute_machine_type = var.compute_machine_type
+  compute_disk_size = var.compute_disk_size
 }
 
 output "ComputeAll" {

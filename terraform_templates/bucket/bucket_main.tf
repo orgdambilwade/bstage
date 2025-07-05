@@ -7,6 +7,7 @@ resource "google_storage_bucket" bucket_name {
  storage_class = "STANDARD"
  force_destroy = true
  uniform_bucket_level_access = true
+ labels = {request_id = "${var.request_id}"}
 
  versioning {
     enabled = true
@@ -31,6 +32,11 @@ website {
 
 variable "region" {
     description = "region to be used"
+    type        = string
+}
+
+variable "request_id" {
+    description = "Request ID"
     type        = string
 }
 

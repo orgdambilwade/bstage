@@ -5,8 +5,8 @@ resource "google_compute_instance" instance_name { //instance_name has a referen
     device_name = var.instance_name
 
     initialize_params {
-      image = "projects/debian-cloud/global/images/debian-12-bookworm-v20250513"
-      size  = 10
+      image = var.compute_image
+      size  = var.compute_disk_size
       type  = "pd-balanced"
     }
 
@@ -20,12 +20,14 @@ resource "google_compute_instance" instance_name { //instance_name has a referen
   labels = {
     goog-ec-src           = "vm_add-tf"
     goog-ops-agent-policy = "v2-x86-template-1-4-0"
+    request_id = "${var.request_id}"
   }
 
-  machine_type = "e2-micro"
+  machine_type = var.compute_machine_type
   metadata = {
     enable-osconfig = "TRUE"
     ssh-keys = "${var.username}:${var.public_key}" # This will be replaced with the actual username and public key
+    
   }
 
   name = var.instance_name
@@ -61,6 +63,7 @@ resource "google_compute_instance" instance_name { //instance_name has a referen
   tags = ["http-server", "https-server"]
   zone = "${var.zone}"
   allow_stopping_for_update = true
+  
 }
 
 

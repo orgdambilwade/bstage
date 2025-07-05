@@ -18,75 +18,81 @@ jobs:
     permissions:
         contents: read
         id-token: write
+    environment: PROCTOR_ENV
 
-        
     steps:
-        - name: Capture Job Start Time
-          id: start
-          run: |
-            echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
-
-        - name: Clone the TF templates directory
-          uses: actions/checkout@v2
-
-        - id: auth
-          name: Authenticate To Google Cloud
-          uses: google-github-actions/auth@v2
-          with:
-            workload_identity_provider: 'projects/351592443/locations/global/workloadIdentityPools/identity-pool-2/providers/da-idp'
-            service_account: '${{ secrets.SERVICE_ACCOUNT }}'
-            project_id: '${{ secrets.PROJECT_ID }}'
+      - name: Echo Env var
+        run: |
+          echo "${{vars.COMPUTE_IMAGE}}"
 
 
-        - name: Setup Cloud SDK
-          uses: google-github-actions/setup-gcloud@v2
+
+        # - name: Capture Job Start Time
+        #   id: start
+        #   run: |
+        #     echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
+
+        # - name: Clone the TF templates directory
+        #   uses: actions/checkout@v2
+
+        # - id: auth
+        #   name: Authenticate To Google Cloud
+        #   uses: google-github-actions/auth@v2
+        #   with:
+        #     workload_identity_provider: 'projects/351592443/locations/global/workloadIdentityPools/identity-pool-2/providers/da-idp'
+        #     service_account: '${{ secrets.SERVICE_ACCOUNT }}'
+        #     project_id: '${{ secrets.PROJECT_ID }}'
+
+
+        # - name: Setup Cloud SDK
+        #   uses: google-github-actions/setup-gcloud@v2
   
-        - name: Use gcloud CLI
-          run: gcloud info
+        # - name: Use gcloud CLI
+        #   run: gcloud info
 
-        - name: Setup Terraform
-          uses: hashicorp/setup-terraform@v2
-          with:
-            terraform_version: 1.7.5
+        # - name: Setup Terraform
+        #   uses: hashicorp/setup-terraform@v2
+        #   with:
+        #     terraform_version: 1.7.5
 
-        - name: Get request details from DB & store it in Shell variables
-          id: post_data
-          run: |
-            echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
-            echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
-            echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
-            echo $ID
-            echo $COMPONENTS
-            echo $RESOURCE_EXPIRY_TIME
+        # - name: Get request details from DB & store it in Shell variables
+        #   id: post_data
+        #   run: |
+        #     echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
+        #     echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
+        #     echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
+        #     echo $ID
+        #     echo $COMPONENTS
+        #     echo $RESOURCE_EXPIRY_TIME
 
             
-        - name: Prepare terraform files
-          run: |
-            echo ${{ steps.post_data.outputs.ID }}
-            cd terraform_templates
-            IFS=','
-            read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
-            for element in "${mod_array[@]}"; do
-              cat references/"$element".txt >> main.tf
-            done
-            sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" main.tf            
-            pwd
+        # - name: Prepare terraform files
+        #   run: |
+        #     echo ${{ steps.post_data.outputs.ID }}
+        #     cd terraform_templates
+        #     IFS=','
+        #     read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
+        #     for element in "${mod_array[@]}"; do
+        #       cat references/"$element".txt >> main.tf
+        #     done
+        #     sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" main.tf            
+        #     pwd
 
-        - name: Apply Terraform
-          id: tf
-          run: |
-            cd terraform_templates
-            cat main.tf
-            terraform init
-            terraform validate
-            terraform plan
-            terraform apply -auto-approve
-            #gsutil cp *.pem gs://staging_bucket_ai/terraform/state/${{ steps.post_data.outputs.ID }}/private_access_key.pem
-            # NOT WORKINGecho "OP=$(terraform output)" >> $GITHUB_OUTPUT
+        # - name: Apply Terraform
+        #   id: tf
+        #   run: |
+        #     cd terraform_templates
+        #     cat main.tf
+        #     terraform init
+        #     terraform validate
+        #     terraform plan
+        #     terraform apply -auto-approve
+        #     #gsutil cp *.pem gs://staging_bucket_ai/terraform/state/${{ steps.post_data.outputs.ID }}/private_access_key.pem
+        #     # NOT WORKINGecho "OP=$(terraform output)" >> $GITHUB_OUTPUT
 
-        - name: Update Provisioned Table
-          run: |
-            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+        # - name: Update Provisioned Table
+        #   run: |
+        #     curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
 
 
 
