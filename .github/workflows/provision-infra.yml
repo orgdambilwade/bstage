@@ -21,19 +21,16 @@ jobs:
     environment: PROCTOR_ENV
 
     steps:
-      - name: Echo Env var
-        run: |
-          echo "${{vars.COMPUTE_IMAGE}}"
 
+      # Select all lines and do CTRL + / to comment-uncomment
 
+        - name: Capture Job Start Time
+          id: start
+          run: |
+            echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
 
-        # - name: Capture Job Start Time
-        #   id: start
-        #   run: |
-        #     echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
-
-        # - name: Clone the TF templates directory
-        #   uses: actions/checkout@v2
+        - name: Clone the TF templates directory
+          uses: actions/checkout@v2
 
         # - id: auth
         #   name: Authenticate To Google Cloud
@@ -55,28 +52,39 @@ jobs:
         #   with:
         #     terraform_version: 1.7.5
 
-        # - name: Get request details from DB & store it in Shell variables
-        #   id: post_data
-        #   run: |
-        #     echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
-        #     echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
-        #     echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
-        #     echo $ID
-        #     echo $COMPONENTS
-        #     echo $RESOURCE_EXPIRY_TIME
+        - name: Get request details from DB & store it in Shell variables
+          id: post_data
+          run: |
+            echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
+            echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
+            echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
+            echo $ID
+            echo $COMPONENTS
+            echo $RESOURCE_EXPIRY_TIME
 
             
-        # - name: Prepare terraform files
-        #   run: |
-        #     echo ${{ steps.post_data.outputs.ID }}
-        #     cd terraform_templates
-        #     IFS=','
-        #     read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
-        #     for element in "${mod_array[@]}"; do
-        #       cat references/"$element".txt >> main.tf
-        #     done
-        #     sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" main.tf            
-        #     pwd
+        - name: Prepare terraform files
+          run: |
+            echo ${{ steps.post_data.outputs.ID }}
+            cd terraform_templates
+            IFS=','
+            read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
+            for element in "${mod_array[@]}"; do
+              cat references/"$element".txt >> main.tf
+            done
+            sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" main.tf            
+            sed -i "s/STAGING_BUCKET/${{ secrets.STAGING_BUCKET }}/g" main.tf
+            sed -i "s/SERVICE_ACCOUNT/${{ secrets.SERVICE_ACCOUNT }}/g" terraform.tfvars
+            sed -i "s/PROJECT_ID/${{ secrets.PROJECT_ID }}/g" terraform.tfvars
+            sed -i "s/REGION/${{ vars.REGION_ROOT }}/g" terraform.tfvars
+            sed -i "s/ZONE/${{ vars.ZONE_ROOT }}/g" terraform.tfvars
+            sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" terraform.tfvars
+            sed -i "s/COMPUTE_IMAGE/${{ vars.COMPUTE_IMAGE }}/g" terraform.tfvars
+            sed -i "s/COMPUTE_MACHINE_TYPE/${{ vars.COMPUTE_MACHINE_TYPE }}/g" terraform.tfvars
+            cat main.tf
+            echo "----------------------"
+            cat terraform.tfvars
+            pwd
 
         # - name: Apply Terraform
         #   id: tf

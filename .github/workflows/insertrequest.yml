@@ -55,7 +55,7 @@ jobs:
 
         
         run: |
-          curl "http://"${{ secrets.POSTGRES_IP }}"/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$(uuidgen)\", \"components\": \"${{ github.event.inputs.components }}\", \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\",\"type\": \"${{ github.event.inputs.type }}\"}"
+          curl "http://"${{ secrets.POSTGRES_IP }}"/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$(tr -dc a-z0-9 </dev/urandom | head -c 6;echo)\", \"components\": \"${{ github.event.inputs.components }}\", \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\",\"type\": \"${{ github.event.inputs.type }}\"}"
         
         
       #- name: Debugging Session with Tmate

@@ -1,14 +1,12 @@
 //The variable values defined in the root module
 
-//The variable values defined in the root module
-
-service_account_root = "service-account-1@eternal-argon-461501-a8.iam.gserviceaccount.com"
-project_id_root = "eternal-argon-461501-a8"
-region_root = "us-central1"
-zone_root = "us-central1-a"
-request_id_root = "b2c3d4"
-compute_image = "projects/debian-cloud/global/images/debian-12-bookworm-v20250513"
-compute_machine_type = "e2-micro" 
+service_account_root = "SERVICE_ACCOUNT"
+project_id_root = "PROJECT_ID"
+region_root = "REGION"
+zone_root = "ZONE"
+request_id_root = "REQUEST_ID"
+compute_image = "COMPUTE_IMAGE"
+compute_machine_type = "COMPUTE_MACHINE_TYPE" 
 compute_disk_size = 10
 
 
