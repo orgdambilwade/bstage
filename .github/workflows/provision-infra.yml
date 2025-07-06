@@ -95,7 +95,7 @@ jobs:
             sed -i "s/ZONE/"${{ vars.ZONE_ROOT }}"/g" terraform.tfvars
             sed -i "s/REQUEST_ID/"${{ steps.post_data.outputs.ID }}"/g" terraform.tfvars
 
-            sed -i "s/COMPUTE_IMAGE/"${{ vars.COMPUTE_IMAGE }}"/g" terraform.tfvars
+            sed -i "s%COMPUTE_IMAGE%"${{ vars.COMPUTE_IMAGE }}"%g" terraform.tfvars
             # sed -i "s/COMPUTE_MACHINE_TYPE/"${{ vars.COMPUTE_MACHINE_TYPE }}"/g" terraform.tfvars
             #cat main.tf
             echo "----------------------"
