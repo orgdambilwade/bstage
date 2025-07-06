@@ -45,8 +45,11 @@ on:
         description: 'Is source code needed'
         required: true
 
-        
-        
+      platform:
+        description: 'Hyperscaler Platform'
+        required: true
+
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -68,8 +71,21 @@ jobs:
 
         
         run: |
-          curl --retry 10 --retry-max-time 180 "http://"${{ secrets.POSTGRES_IP }}"/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$(tr -dc a-z0-9 </dev/urandom | head -c 6;echo)\", \"components\": \"${{ github.event.inputs.components }}\", \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\",\"type\": \"${{ github.event.inputs.type }}\",\"agent_identifier_name\":\"${{ github.event.inputs.agent_identifier_name }}\",\"email_id\":\"${{ github.event.inputs.email_id }}\",\"industry\":\"${{ github.event.inputs.industry }}\",\"source_code_needed\":\"${{ github.event.inputs.source_code_needed }}\"}"
-        
+          # curl --retry 10 --retry-max-time 180 "http://"${{ secrets.POSTGRES_IP }}"/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$(tr -dc a-z0-9 </dev/urandom | head -c 6;echo)\", \"components\": \"${{ github.event.inputs.components }}\", \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\",\"type\": \"${{ github.event.inputs.type }}\",\"agent_identifier_name\":\"${{ github.event.inputs.agent_identifier_name }}\",\"email_id\":\"${{ github.event.inputs.email_id }}\",\"industry\":\"${{ github.event.inputs.industry }}\",\"source_code_needed\":\"${{ github.event.inputs.source_code_needed }}\",\"platform\":\"${{ github.event.inputs.platform }}\"}"
+          curl --retry 10 --retry-max-time 180 "http://"${{ secrets.POSTGRES_IP }}"/REQUESTED" -X POST -H "Content-Type: application/json"  -d @- << EOF
+          {
+            \"id\": \"$(tr -dc a-z0-9 </dev/urandom | head -c 6;echo)\", 
+            \"components\": \"${{ github.event.inputs.components }}\",
+            \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , 
+            \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\",
+            \"type\": \"${{ github.event.inputs.type }}\",
+            \"agent_identifier_name\":\"${{ github.event.inputs.agent_identifier_name }}\",
+            \"email_id\":\"${{ github.event.inputs.email_id }}\",
+            \"industry\":\"${{ github.event.inputs.industry }}\",
+            \"source_code_needed\":\"${{ github.event.inputs.source_code_needed }}\",
+            \"platform\":\"${{ github.event.inputs.platform }}\"
+          } 
+          EOF  
         
       #- name: Debugging Session with Tmate
       #  uses: mxschmitt/action-tmate@v3    
