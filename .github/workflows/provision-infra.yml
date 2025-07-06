@@ -1,10 +1,19 @@
 #Provisions the infra creation requests on Google Cloud Platform
 
-name: Provision the Infrastructure
+name: Provision or Deprovision the Infrastructure
 
 on:
 # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
+      inputs:
+        action:
+          description: 'Agent Action'
+          required: true
+          default: 'create'
+          type: choice
+          options:
+            - create
+            - destroy
 
 permissions:
     contents: read
@@ -23,27 +32,41 @@ jobs:
     steps:
 
       # Select all lines and do CTRL + / to comment-uncomment
-
-        - name: Get request details from DB & store it in Shell variables
-          id: post_data
+        - name: Set the Operation Type 
+          id: optype
           run: |
-            echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
-            echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
-            echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
+            if [ ${{ github.event.inputs.action == 'create' }}]; then
+              OPTYPE="PENDINGINFRACREATION"
+            else
+              OPTYPE="PENDINGINFRADELETION"
+            
+              echo $OPTYPE
+
+
+
+
+        # - name: Get request details from DB & store it in Shell variables
+        #   id: post_data
+        #   run: |
+        #     echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
+        #     echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
+        #     echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
             
 
-        - name: Capture Job Start Time
-          id: start
-          if: ${{ steps.post_data.outputs.ID != 'null' }}
-          run: |
-            echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
-            echo ${{ steps.post_data.outputs.ID }}
+        # - name: Capture Job Start Time
+        #   id: start
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') }}
+        #   run: |
+        #     echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
+        #     echo ${{ steps.post_data.outputs.ID }}
 
         # - name: Clone the TF templates directory
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') }}        
         #   uses: actions/checkout@v2
 
         # - id: auth
         #   name: Authenticate To Google Cloud
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') }}
         #   uses: google-github-actions/auth@v2
         #   with:
         #     workload_identity_provider: 'projects/351592443/locations/global/workloadIdentityPools/identity-pool-2/providers/da-idp'
@@ -52,13 +75,16 @@ jobs:
 
 
         # - name: Setup Cloud SDK
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') }}
         #   uses: google-github-actions/setup-gcloud@v2
   
         # - name: Use gcloud CLI
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') }}
         #   run: gcloud info
 
         # - name: Setup Terraform
         #   uses: hashicorp/setup-terraform@v2
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') }}
         #   with:
         #     terraform_version: 1.7.5
 
@@ -70,6 +96,7 @@ jobs:
         #     echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
             
         # - name: Prepare terraform files
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') }}
         #   run: |
         #     echo ${{ steps.post_data.outputs.ID }}
         #     cd terraform_templates
@@ -92,16 +119,18 @@ jobs:
 
         # - name: Apply Terraform
         #   id: tf
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') }}
         #   run: |
         #     cd terraform_templates
         #     cat main.tf
         #     terraform init
         #     terraform validate
         #     terraform plan
-        #     terraform apply -auto-approve
+        #     terraform ${{ github.event.inputs.action }} -auto-approve
 
         # - name: Output the Results
         #   id: output
+        #   if: ${{ (steps.post_data.outputs.ID != 'null') && (github.event.inputs.action == 'create') }}
         #   run: |
         #     cd terraform_templates
         #     BUCKET_NAME=$(terraform-bin output -json | jq -r ".BucketAll.value.bucket_result")
