@@ -36,9 +36,9 @@ jobs:
           id: op
           run: |
             if [[ "${{ github.event.inputs.action }}" == "create" ]]; then
-              echo "OPTYPE=PENDINGINFRACREATION" >> $GITHUB_OUTPUT
+              echo "OPTYPE=PENDINGINFRACREATION" >> "$GITHUB_OUTPUT"
             else
-              echo "OPTYPE=PENDINGINFRADELETION" >> $GITHUB_OUTPUT
+              echo "OPTYPE=PENDINGINFRADELETION" >> "$GITHUB_OUTPUT"
 
         - name: Echo the Operation
           run: |
