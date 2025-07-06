@@ -33,7 +33,7 @@ jobs:
 
         - name: Capture Job Start Time
           id: start
-          if: ${{ steps.post_data.outputs.ID != '' }}
+          if: ${{ steps.post_data.outputs.ID != null }}
           run: |
             echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
             echo ${{ steps.post_data.outputs.ID }}
