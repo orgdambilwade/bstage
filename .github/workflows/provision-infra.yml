@@ -90,44 +90,56 @@ jobs:
             terraform plan
             terraform apply -auto-approve
 
+            echo "OP=$(terraform-bin output)" >> $GITHUB_OUTPUT
+            echo "++++++++++++++++++++++++"
+            echo $OP
+            
+            echo "BUCKET_NAME=$(terraform-bin output -json | jq -r ".BucketAll.value.bucket_result")" >> $GITHUB_OUTPUT
+            echo "++++++++++++++++++++++++"
+            echo $BUCKET_NAME
+
+            echo "VM_HOSTNAME=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_2_hostname")" >> $GITHUB_OUTPUT
+            echo "++++++++++++++++++++++++"
+            echo $VM_HOSTNAME
+
+            echo "VM_EXT_IP=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_4_Network_IP_EXT")" >> $GITHUB_OUTPUT
+            echo "++++++++++++++++++++++++"
+            echo $VM_EXT_IP
+
+            echo "VM_USERNAME=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_5_UserName")" >> $GITHUB_OUTPUT
+            echo "++++++++++++++++++++++++"
+            echo $VM_USERNAME
+
+            echo "SSH_CONNECTION_STRING=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_6_ConnectionString")" >> $GITHUB_OUTPUT
+            echo "++++++++++++++++++++++++"
+            echo $SSH_CONNECTION_STRING
 
 
-            # echo "OP=$(terraform output -raw)" >> $GITHUB_OUTPUT
-            # echo $OP
-        #     echo "BUCKET_NAME=$(terraform output -json | jq -r ".BucketAll.value.bucket_result")" >> $GITHUB_OUTPUT
-        #     echo "VM_HOSTNAME=$(terraform output -json | jq -r ".ComputeAll.value.Result_2_hostname")" >> $GITHUB_OUTPUT
-        #     echo "VM_EXT_IP=$(terraform output -json | jq -r ".ComputeAll.value.Result_4_Network_IP_EXT")" >> $GITHUB_OUTPUT
-        #     echo "VM_USERNAME=$(terraform output -json | jq -r ".ComputeAll.value.Result_5_UserName")" >> $GITHUB_OUTPUT
-        #     echo "SSH_CONNECTION_STRING=$(terraform output -json | jq -r ".ComputeAll.value.Result_6_ConnectionString")" >> $GITHUB_OUTPUT
-
-
-
-
-        - name: Debugging Session with Tmate
-          uses: mxschmitt/action-tmate@v3    
+        # - name: Debugging Session with Tmate
+        #   uses: mxschmitt/action-tmate@v3    
         # Runs a set of commands using the runners shell           
 
-        # - name: Output the Results
-        #   id: output
-        #   run: |
-        #     echo "${{ steps.tf.outputs.OP }}"
-        #     echo "================================="    
-        #     echo "${{ steps.tf.outputs.BUCKET_NAME }}"
-        #     echo "================================="
-        #     echo "${{ steps.tf.outputs.VM_HOSTNAME }}"
-        #     echo "================================="
-        #     echo "${{ steps.tf.outputs.VM_EXT_IP }}"
-        #     echo "================================="
-        #     echo "${{ steps.tf.outputs.VM_USERNAME }}"
-        #     echo "================================="
-        #     echo "${{ steps.tf.outputs.SSH_CONNECTION_STRING }}"
-        #     echo "================================="
-        #     echo "================================="
+        - name: Output the Results
+          id: output
+          run: |
+            echo "${{ steps.tf.outputs.OP }}"
+            echo "================================="    
+            echo "${{ steps.tf.outputs.BUCKET_NAME }}"
+            echo "================================="
+            echo "${{ steps.tf.outputs.VM_HOSTNAME }}"
+            echo "================================="
+            echo "${{ steps.tf.outputs.VM_EXT_IP }}"
+            echo "================================="
+            echo "${{ steps.tf.outputs.VM_USERNAME }}"
+            echo "================================="
+            echo "${{ steps.tf.outputs.SSH_CONNECTION_STRING }}"
+            echo "================================="
+            echo "================================="
 
 
-        # - name: Update Provisioned Table
-        #   run: |
-        #     curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+        - name: Update Provisioned Table
+          run: |
+            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"${{ steps.tf.outputs.OP }}\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
 
 
 
