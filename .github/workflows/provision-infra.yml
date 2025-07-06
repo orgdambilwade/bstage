@@ -85,9 +85,9 @@ jobs:
               cat references/"$element".txt >> main.tf
             done         
 
-            sed -i "s/STAGING_BUCKET/"${STAGING_BUCKET}"/g" main.tf
-            # sed -i "s/REQUEST_ID/$REQUEST_ID/g" main.tf
-            # sed -i "s/SERVICE_ACCOUNT/$SERVICE_ACCOUNT/g" terraform.tfvars
+            sed -i "s/STAGING_BUCKET/"${{ secrets.STAGING_BUCKET }}"/g" main.tf
+            sed -i "s/REQUEST_ID/"${{ steps.post_data.outputs.ID }}"/g" main.tf
+            # sed -i "s/SERVICE_ACCOUNT/"${{ secrets.SERVICE_ACCOUNT }}"/g" terraform.tfvars
             # sed -i "s/PROJECT_ID/$PROJECT_ID/g" terraform.tfvars
             # sed -i "s/REGION/$REGION_ROOT/g" terraform.tfvars
             # sed -i "s/ZONE/$ZONE_ROOT/g" terraform.tfvars
