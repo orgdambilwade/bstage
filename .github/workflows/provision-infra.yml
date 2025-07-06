@@ -123,12 +123,12 @@ jobs:
           id: output
           run: |
             cd terraform_templates
-            terraform-bin output
-            terraform-bin output -json | jq -r ".BucketAll.value.bucket_result"
-            terraform-bin output -json | jq -r ".ComputeAll.value.Result_2_hostname"
-            terraform-bin output -json | jq -r ".ComputeAll.value.Result_4_Network_IP_EXT"
-            terraform-bin output -json | jq -r ".ComputeAll.value.Result_5_UserName"
-            terraform-bin output -json | jq -r ".ComputeAll.value.Result_6_ConnectionString"
+            curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"$(terraform output)\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+            # terraform-bin output -json | jq -r ".BucketAll.value.bucket_result"
+            # terraform-bin output -json | jq -r ".ComputeAll.value.Result_2_hostname"
+            # terraform-bin output -json | jq -r ".ComputeAll.value.Result_4_Network_IP_EXT"
+            # terraform-bin output -json | jq -r ".ComputeAll.value.Result_5_UserName"
+            # terraform-bin output -json | jq -r ".ComputeAll.value.Result_6_ConnectionString"
 
 
 
