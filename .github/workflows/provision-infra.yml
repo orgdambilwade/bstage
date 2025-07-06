@@ -36,13 +36,14 @@ jobs:
           id: op
           run: |
             if [[ "${{ github.event.inputs.action }}" == "create" ]]; then
-              echo "OPTYPE=PENDINGINFRACREATION" >> "$GITHUB_OUTPUT"
+              echo "OPTYPE=PENDINGINFRACREATION" >> "$GITHUB_ENV"
             else
-              echo "OPTYPE=PENDINGINFRADELETION" >> "$GITHUB_OUTPUT"
+              echo "OPTYPE=PENDINGINFRADELETION" >> "$GITHUB_ENV"
 
         - name: Echo the Operation
           run: |
-            echo ${{ steps.op.outputs.OPTYPE }}
+            # echo ${{ steps.op.outputs.OPTYPE }}
+            echo "${{ env.OPTYPE }}"
 
 
 
