@@ -30,10 +30,11 @@ jobs:
             echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
             echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
             echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
+            
 
         - name: Capture Job Start Time
           id: start
-          if: ${{ steps.post_data.outputs.ID != null }}
+          if: ${{ steps.post_data.outputs.ID != 'null' }}
           run: |
             echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
             echo ${{ steps.post_data.outputs.ID }}
