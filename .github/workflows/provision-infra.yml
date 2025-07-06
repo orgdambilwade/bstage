@@ -33,14 +33,15 @@ jobs:
 
       # Select all lines and do CTRL + / to comment-uncomment
         - name: Set the Operation Type 
-          id: optype
+          id: op
           run: |
             if [ ${{ github.event.inputs.action == 'create' }}]; then
-              OPTYPE="PENDINGINFRACREATION"
+              echo "OPTYPE='PENDINGINFRACREATION'" >> $GITHUB_OUTPUT
             else
-              OPTYPE="PENDINGINFRADELETION"
+              echo "OPTYPE='PENDINGINFRADELETION'" >> $GITHUB_OUTPUT
             
               echo $OPTYPE
+              # echo "${{ steps.op.output.OPTYPE }}"
 
 
 
