@@ -1,6 +1,6 @@
 #Provisions the infra creation requests on Google Cloud Platform
 
-name: Provision or Deprovision the Infrastructure
+name: Provision the Infrastructure
 
 on:
 # Allows you to run this workflow manually from the Actions tab
@@ -112,14 +112,6 @@ jobs:
           if: ${{ (steps.post_data.outputs.ID != 'null') }}
           run: |
             cd terraform_templates
-            # BUCKET_NAME=$(terraform-bin output -json | jq -r ".BucketAll.value.bucket_result")
-            # HOSTNAME=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_2_hostname")
-            # EXT_IP=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_4_Network_IP_EXT")
-            # USERNAME=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_5_UserName")
-            # CONNECTIONSTRING=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_6_ConnectionString")
-            terraform-bin output
-            echo "++++++++++++++++++++++++++++++"
-            terraform-bin output -json | base64 -w 0
             curl "http://"${{ secrets.POSTGRES_IP }}"/PROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"$(terraform-bin output -json | base64 -w 0)\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
             
 
