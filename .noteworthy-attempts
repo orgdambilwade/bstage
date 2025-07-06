@@ -37,3 +37,10 @@ The tmate session for Debugging
           # sed -i "s/STAGING_BUCKET/"$STAGING_BUCKET"/g" main.tf
           # sed -i "s/REQUEST_ID/"$REQUEST_ID"/g" main.tf
           # sed -i "s/SERVICE_ACCOUNT/"${SERVICE_ACCOUNT}"/g" terraform.tfvars
+
+
+            # BUCKET_NAME=$(terraform-bin output -json | jq -r ".BucketAll.value.bucket_result")
+            # HOSTNAME=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_2_hostname")
+            # EXT_IP=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_4_Network_IP_EXT")
+            # USERNAME=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_5_UserName")
+            # CONNECTIONSTRING=$(terraform-bin output -json | jq -r ".ComputeAll.value.Result_6_ConnectionString")

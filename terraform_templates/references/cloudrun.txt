@@ -1,6 +1,6 @@
 module "cloudrun" {
     source = "./cloudrun"
-    tf_unique_id = "cloudrun${random_id.rand_id_1.hex}"
+    tf_unique_id = var.request_id_root
 }
 
 output "cloudrunall" {

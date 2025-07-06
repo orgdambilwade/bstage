@@ -1,6 +1,6 @@
 module "kubernetes" {
     source = "./kubernetes"
-    tf_unique_id = "kubernetes${random_id.rand_id_1.hex}"
+    tf_unique_id = var.request_id_root
 }
 
 output "kubernetesall" {
