@@ -39,10 +39,10 @@ jobs:
               echo "OPTYPE='PENDINGINFRACREATION'" >> $GITHUB_OUTPUT
             else
               echo "OPTYPE='PENDINGINFRADELETION'" >> $GITHUB_OUTPUT
-            
-              echo $OPTYPE
-              # echo "${{ steps.op.output.OPTYPE }}"
 
+        - name: Echo the Operation
+          run: |
+            echo ${{ steps.op.outputs.OPTYPE }}
 
 
 
