@@ -32,6 +32,19 @@ on:
       type:
         description: 'Provisioning request type'
         required: true
+
+      email_id:
+        description: 'Email ID of the Requestor'
+        required: true
+
+      industry:
+        description: 'Industry of the AI Agent'
+        required: true
+
+      source_code_needed:
+        description: 'Is source code needed'
+        required: true
+
         
         
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
@@ -55,7 +68,7 @@ jobs:
 
         
         run: |
-          curl "http://"${{ secrets.POSTGRES_IP }}"/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$(tr -dc a-z0-9 </dev/urandom | head -c 6;echo)\", \"components\": \"${{ github.event.inputs.components }}\", \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\",\"type\": \"${{ github.event.inputs.type }}\"}"
+          curl --retry 10 --retry-max-time 180 "http://"${{ secrets.POSTGRES_IP }}"/REQUESTED" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"$(tr -dc a-z0-9 </dev/urandom | head -c 6;echo)\", \"components\": \"${{ github.event.inputs.components }}\", \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\",\"type\": \"${{ github.event.inputs.type }}\",\"agent_identifier_name\":\"${{ github.event.inputs.agent_identifier_name }}\",\"email_id\":\"${{ github.event.inputs.email_id }}\",\"industry\":\"${{ github.event.inputs.industry }}\",\"source_code_needed\":\"${{ github.event.inputs.source_code_needed }}\"}"
         
         
       #- name: Debugging Session with Tmate
