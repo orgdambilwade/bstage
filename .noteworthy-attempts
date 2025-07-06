@@ -1,0 +1,39 @@
+The Curl multiline didnt work as expected in the insert request.. Schema Error
+
+          curl --retry 10 --retry-max-time 180 "http://"${{ secrets.POSTGRES_IP }}"/REQUESTED" -X POST -H "Content-Type: application/json"  -d @- << EOF
+          "{
+            \"id\": \"$(tr -dc a-z0-9 </dev/urandom | head -c 6;echo)\", 
+            \"components\": \"${{ github.event.inputs.components }}\",
+            \"requestedtime\": \"$(date --utc --iso-8601=seconds)\" , 
+            \"expirytime\": \"$(date --utc --iso-8601=seconds -d "+${{ github.event.inputs.duration }} days")\",
+            \"type\": \"${{ github.event.inputs.type }}\",
+            \"agent_identifier_name\":\"${{ github.event.inputs.agent_identifier_name }}\",
+            \"email_id\":\"${{ github.event.inputs.email_id }}\",
+            \"industry\":\"${{ github.event.inputs.industry }}\",
+            \"source_code_needed\":\"${{ github.event.inputs.source_code_needed }}\",
+            \"platform\":\"${{ github.event.inputs.platform }}\"
+          }" 
+          EOF 
+
+The tmate session for Debugging
+        
+      #- name: Debugging Session with Tmate
+      #  uses: mxschmitt/action-tmate@v3    
+      # Runs a set of commands using the runners shell
+
+# Setup variables for a specific Job Step 
+
+#         - name: Prepare terraform files
+          # env:
+          #   STAGING_BUCKET: ${{ secrets.STAGING_BUCKET }}
+          #   REQUEST_ID: ${{ steps.post_data.outputs.ID }}
+          #   SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
+          #   PROJECT_ID: ${{ secrets.PROJECT_ID }}
+          #   REGION: ${{ vars.REGION_ROOT }}
+          #   ZONE: ${{ vars.ZONE_ROOT }}
+          #   COMPUTE_IMAGE: ${{ vars.COMPUTE_IMAGE }}
+          #   COMPUTE_MACHINE_TYPE: ${{ vars.COMPUTE_MACHINE_TYPE }}
+
+          # sed -i "s/STAGING_BUCKET/"$STAGING_BUCKET"/g" main.tf
+          # sed -i "s/REQUEST_ID/"$REQUEST_ID"/g" main.tf
+          # sed -i "s/SERVICE_ACCOUNT/"${SERVICE_ACCOUNT}"/g" terraform.tfvars

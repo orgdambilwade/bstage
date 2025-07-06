@@ -58,22 +58,8 @@ jobs:
             echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
             echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
             echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRACREATION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
-            # echo $ID
-            # echo $COMPONENTS
-            # echo $RESOURCE_EXPIRY_TIME
-
             
         - name: Prepare terraform files
-          # env:
-          #   STAGING_BUCKET: ${{ secrets.STAGING_BUCKET }}
-          #   REQUEST_ID: ${{ steps.post_data.outputs.ID }}
-          #   SERVICE_ACCOUNT: ${{ secrets.SERVICE_ACCOUNT }}
-          #   PROJECT_ID: ${{ secrets.PROJECT_ID }}
-          #   REGION: ${{ vars.REGION_ROOT }}
-          #   ZONE: ${{ vars.ZONE_ROOT }}
-          #   COMPUTE_IMAGE: ${{ vars.COMPUTE_IMAGE }}
-          #   COMPUTE_MACHINE_TYPE: ${{ vars.COMPUTE_MACHINE_TYPE }}
-
           run: |
             echo ${{ steps.post_data.outputs.ID }}
             cd terraform_templates
@@ -82,10 +68,6 @@ jobs:
             for element in "${mod_array[@]}"; do
               cat references/"$element".txt >> main.tf
             done         
-
-            # sed -i "s/STAGING_BUCKET/"$STAGING_BUCKET"/g" main.tf
-            # sed -i "s/REQUEST_ID/"$REQUEST_ID"/g" main.tf
-            # sed -i "s/SERVICE_ACCOUNT/"${SERVICE_ACCOUNT}"/g" terraform.tfvars
 
             sed -i "s/STAGING_BUCKET/"${{ secrets.STAGING_BUCKET }}"/g" main.tf
             sed -i "s/REQUEST_ID/"${{ steps.post_data.outputs.ID }}"/g" main.tf
@@ -98,11 +80,6 @@ jobs:
             sed -i "s/COMPUTE_MACHINE_TYPE/"${{ vars.COMPUTE_MACHINE_TYPE }}"/g" terraform.tfvars
 
 
-
-        # - name: Debugging Session with Tmate
-        #   uses: mxschmitt/action-tmate@v3    
-        #Runs a set of commands using the runners shell    
-
         - name: Apply Terraform
           id: tf
           run: |
@@ -112,13 +89,23 @@ jobs:
             terraform validate
             terraform plan
             terraform apply -auto-approve
-            echo "OP=$(terraform output -raw)" >> $GITHUB_OUTPUT
-            echo $OP
+
+
+
+            # echo "OP=$(terraform output -raw)" >> $GITHUB_OUTPUT
+            # echo $OP
         #     echo "BUCKET_NAME=$(terraform output -json | jq -r ".BucketAll.value.bucket_result")" >> $GITHUB_OUTPUT
         #     echo "VM_HOSTNAME=$(terraform output -json | jq -r ".ComputeAll.value.Result_2_hostname")" >> $GITHUB_OUTPUT
         #     echo "VM_EXT_IP=$(terraform output -json | jq -r ".ComputeAll.value.Result_4_Network_IP_EXT")" >> $GITHUB_OUTPUT
         #     echo "VM_USERNAME=$(terraform output -json | jq -r ".ComputeAll.value.Result_5_UserName")" >> $GITHUB_OUTPUT
         #     echo "SSH_CONNECTION_STRING=$(terraform output -json | jq -r ".ComputeAll.value.Result_6_ConnectionString")" >> $GITHUB_OUTPUT
+
+
+
+
+        - name: Debugging Session with Tmate
+          uses: mxschmitt/action-tmate@v3    
+        # Runs a set of commands using the runners shell           
 
         # - name: Output the Results
         #   id: output
