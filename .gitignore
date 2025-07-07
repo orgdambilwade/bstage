@@ -5,3 +5,8 @@ terraform.tfstate
 terraform.tfstate.backup
 .terraform.lock.hcl
 *.pem
+.terraform_templates/compute_dummy
+.terraform_templates/storage_dummy
+.terraform_templates/references/compute_dummy.txt
+.terraform_templates/references/storage_dummy.txt
+
