@@ -1,36 +1,49 @@
-#Deprovisions the infra creation requests on Google Cloud Platform
+#De provisions the infra creation requests on Google Cloud Platform
 
 name: Deprovision the Infrastructure
 
 on:
 # Allows you to run this workflow manually from the Actions tab
     workflow_dispatch:
-
+      
 permissions:
     contents: read
     id-token: write
 
 jobs:
   # This workflow contains a single job called "build"
-  process_deprovisioning_request:
+  process_infra_deprovisioning_request:
     # The type of runner that the job will run on
     runs-on: ubuntu-24.04
     permissions:
         contents: read
         id-token: write
+    environment: PROCTOR_ENV
 
-        
     steps:
+
+        - name: Get request details from DB & store it in Shell variables
+          id: post_data
+          run: |
+            echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRADELETION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
+            echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRADELETION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
+            echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRADELETION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
+            
+
         - name: Capture Job Start Time
           id: start
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}
           run: |
             echo "JOBSTARTTIME=$(date --utc --iso-8601=seconds)" >> $GITHUB_OUTPUT
+            echo ${{ steps.post_data.outputs.ID }}
 
         - name: Clone the TF templates directory
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}        
           uses: actions/checkout@v2
 
         - id: auth
           name: Authenticate To Google Cloud
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}
           uses: google-github-actions/auth@v2
           with:
             workload_identity_provider: 'projects/351592443/locations/global/workloadIdentityPools/identity-pool-2/providers/da-idp'
@@ -39,28 +52,21 @@ jobs:
 
 
         - name: Setup Cloud SDK
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}
           uses: google-github-actions/setup-gcloud@v2
   
         - name: Use gcloud CLI
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}
           run: gcloud info
 
         - name: Setup Terraform
           uses: hashicorp/setup-terraform@v2
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}
           with:
             terraform_version: 1.7.5
-
-        - name: Get request details from DB & store it in Shell variables
-          id: post_data
-          run: |
-            echo "ID=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRADELETION | jq -r ".[0].id")" >> $GITHUB_OUTPUT
-            echo "COMPONENTS=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRADELETION | jq -r ".[0].components")" >> $GITHUB_OUTPUT
-            echo "RESOURCE_EXPIRY_TIME=$(curl http://"${{ secrets.POSTGRES_IP }}"/PENDINGINFRADELETION | jq -r ".[0].expirytime")" >> $GITHUB_OUTPUT
-            echo $ID
-            echo $COMPONENTS
-            echo $RESOURCE_EXPIRY_TIME
-
             
         - name: Prepare terraform files
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}
           run: |
             echo ${{ steps.post_data.outputs.ID }}
             cd terraform_templates
@@ -68,12 +74,22 @@ jobs:
             read -ra mod_array <<< ${{ steps.post_data.outputs.COMPONENTS }}
             for element in "${mod_array[@]}"; do
               cat references/"$element".txt >> main.tf
-            done
-            sed -i "s/REQUEST_ID/${{ steps.post_data.outputs.ID }}/g" main.tf
-            pwd
+            done         
+
+            sed -i "s/STAGING_BUCKET/"${{ secrets.STAGING_BUCKET }}"/g" main.tf
+            sed -i "s/REQUEST_ID/"${{ steps.post_data.outputs.ID }}"/g" main.tf
+            sed -i "s/SERVICE_ACCOUNT/"${{ secrets.SERVICE_ACCOUNT }}"/g" terraform.tfvars
+            sed -i "s/PROJECT_ID/"${{ secrets.PROJECT_ID }}"/g" terraform.tfvars
+            sed -i "s/REGION/"${{ vars.REGION_ROOT }}"/g" terraform.tfvars
+            sed -i "s/ZONE/"${{ vars.ZONE_ROOT }}"/g" terraform.tfvars
+            sed -i "s/REQUEST_ID/"${{ steps.post_data.outputs.ID }}"/g" terraform.tfvars
+            sed -i "s%COMPUTE_IMAGE%"${{ vars.COMPUTE_IMAGE }}"%g" terraform.tfvars
+            sed -i "s/COMPUTE_MACHINE_TYPE/"${{ vars.COMPUTE_MACHINE_TYPE }}"/g" terraform.tfvars
+
 
         - name: Apply Terraform
           id: tf
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}
           run: |
             cd terraform_templates
             cat main.tf
@@ -81,11 +97,15 @@ jobs:
             terraform validate
             terraform plan
             terraform destroy -auto-approve
-            # NOT WORKINGecho "OP=$(terraform output)" >> $GITHUB_OUTPUT
 
-        - name: Update Deprovisioned Table
+        - name: Output the Results
+          id: output
+          if: ${{ (steps.post_data.outputs.ID != 'null') }}
           run: |
-            curl "http://"${{ secrets.POSTGRES_IP }}"/DEPROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"abcpqrxyz\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+            cd terraform_templates
+            curl "http://"${{ secrets.POSTGRES_IP }}"/DEPROVISIONEDINFRA" -X POST -H "Content-Type: application/json"  -d "{\"id\": \"${{ steps.post_data.outputs.ID }}\", \"jobstarttime\": \"${{ steps.start.outputs.JOBSTARTTIME }}\", \"jobendtime\": \"$(date --utc --iso-8601=seconds)\" , \"joboutput\": \"$(terraform-bin output -json | base64 -w 0)\",\"resourceexpirytime\":\"${{ steps.post_data.outputs.RESOURCE_EXPIRY_TIME }}\"}"
+            
+
 
 
 
